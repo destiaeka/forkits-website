@@ -35,7 +35,7 @@ const activities = [
     category: "Bootcamp",
     capacity: 30,
     registered: 30,
-    image: "/rand.jpg",
+    image: "/rand.JPG",
   },
 ]
 
