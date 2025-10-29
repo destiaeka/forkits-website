@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: forkits-web
-        image: destiaeka/forkits
+        image: destiaeka/forkits-web
         ports:
         - containerPort: 80
 
