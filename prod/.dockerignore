@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+yarn-error.log
+.pnpm-store
+.next/cache
+out
+dist
+coverage
+.env.local
+.env.development
+.env.test
+.env.production
