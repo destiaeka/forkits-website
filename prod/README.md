@@ -77,5 +77,5 @@ Akses di browser
 ```<ip node>:<ip port>```
 
 # ✅ Result
-![result1](result1.jpg)
+![result1](result1.jpeg)
 ![result2](result2.jpg)
