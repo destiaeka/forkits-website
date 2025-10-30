@@ -19,22 +19,21 @@ Proyek ini mengikuti struktur default dari `create-next-app`, dengan folder utam
 Pastikan kamu sudah menginstal **Node.js (versi 18 atau lebih baru)** di perangkatmu.
 Lalu jalankan langkah berikut:
 
-```
-# 1. Install dependencies
-npm install
-# atau
-yarn install
+1. Install dependencies
+``` npm install```
+atau
+```yarn install```
 
-# 2. Jalankan server development
-npm run dev
-# atau
-yarn dev
-```
+2. Jalankan server development
+```npm run dev```
+atau
+```yarn dev```
+
 
 Akses aplikasi di browser:
 ``` http://localhost:3000```
 
-🛠️ Build untuk Production
+# 🛠️ Build untuk Production
 
 Untuk menjalankan dalam mode production:
 ```
