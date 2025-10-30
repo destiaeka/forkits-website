@@ -13,37 +13,47 @@ Dokumentasi ini menjelaskan langkah-langkah untuk membangun image Docker, mendor
 Langkah ini digunakan untuk membangun image dari source code aplikasi.
 1. Clone repository
 ```
-git clone https://github.com/destiaeka/forkits-website.git
-cd forkits-website
+root@103-160-37-103 ~] git clone https://github.com/destiaeka/forkits-website.git
+root@103-160-37-103 ~] cd forkits-website
 ```
 2. Build image Docker
-```docker build -t destiaeka/forkits-web . ```
-3. Verifikasi image sudah terbuat
-```docker image ls```
+```[
+[root@103-160-37-103 forkits-website]# docker build -t destiaeka/forkits-web .
+ ```
+4. Verifikasi image sudah terbuat
+```
+[root@103-160-37-103 forkits-website]# docker image ls
+```
 > 💡 Tips: Pastikan kamu berada di direktori yang berisi file Dockerfile sebelum menjalankan perintah build.
 
 ## ☁️ Push Image ke Registry
 Setelah image berhasil dibuat, kita perlu mendorongnya ke Docker Hub agar bisa digunakan oleh Kubernetes untuk melakukan pull image saat deploy.
-```docker push destiaeka/forkits-web```
-⚠️ Jika kamu belum login ke Docker Hub, jalankan terlebih dahulu:
+```
+[root@103-160-37-103 ~]# docker push destiaeka/forkits-web
+```
+> ⚠️ Jika kamu belum login ke Docker Hub, jalankan terlebih dahulu:
 ``` docker login ```
 
 ## ⚙️ Instalasi K3s (Single Node Cluster)
 
 Di sini digunakan K3s single cluster karena ringan dan cocok untuk kebutuhan development maupun staging.
 1. Install K3s
-```curl -sfL https://get.k3s.io | sh -```
-2. Konfigurasi Kubeconfig untuk Non-root User
+```
+[root@103-160-37-103 ~]# curl -sfL https://get.k3s.io | sh -
+```
+3. Konfigurasi Kubeconfig untuk Non-root User
 Agar user biasa bisa menjalankan kubectl, lakukan konfigurasi berikut:
 ```
-mkdir -p $HOME/.kube
-sudo cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
+[root@103-160-37-103 ~]$ su - ides
+[ides@103-160-37-103 ~]$ mkdir -p $HOME/.kube
+[ides@103-160-37-103 ~]$ sudo cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config
+[ides@103-160-37-103 ~]$ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 3. Verifikasi Cluster Berjalan
 ```
-kubectl get nodes
-kubectl get pods -A
+[ides@103-160-37-103 ~]$ kubectl get nodes
+NAME                         STATUS   ROLES                  AGE   VERSION
+103-160-37-103.cprapid.com   Ready    control-plane,master   21h   v1.33.5+k3s1
 ```
 > ✅ Jika status node Ready, berarti K3s sudah berhasil dijalankan
 
@@ -57,21 +67,47 @@ File ini berisi 3 resource utama:
 1. Apply Manifest
 Masuk ke direktori produksi dan apply konfigurasi:
 ```
-cd forkits-website/production
-kubectl apply -f forkits-deployment.yml
+[ides@103-160-37-103 ~]$ cd forkits-website/production
+[ides@103-160-37-103 ~]$ kubectl apply -f forkits-deployment.yml
 ```
 2. Verifikasi Resource
 Cek apakah deployment, service, dan HPA sudah berjalan:
-```kubectl get all```
+```
+[ides@103-160-37-103 ~]$ kubectl get all
+NAME                                      READY   STATUS    RESTARTS      AGE
+pod/forkits-deployment-569b7f5c48-cz8qz   1/1     Running   1 (40m ago)   132m
+pod/forkits-deployment-569b7f5c48-q5mc7   1/1     Running   1 (40m ago)   132m
+
+NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+service/forkits-svc   NodePort    10.43.104.143   <none>        80:30001/TCP   132m
+service/kubernetes    ClusterIP   10.43.0.1       <none>        443/TCP        133m
+
+NAME                                 READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/forkits-deployment   2/2     2            2           132m
+
+NAME                                            DESIRED   CURRENT   READY   AGE
+replicaset.apps/forkits-deployment-569b7f5c48   2         2         2       132m
+
+NAME                                              REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/hpa-forkits   Deployment/forkits-deployment   cpu: <unknown>/50%   2         5         2          132m
+```
 Kamu akan melihat minimal 2 pod aktif (hasil scaling dari HPA).
 
 ## Untuk mengakses web dari browser:
 
 Cek IP node:
-```kubectl get nodes -o wide```
+```
+[ides@103-160-37-103 ~]$ kubectl get nodes -o wide
+NAME                         STATUS   ROLES                  AGE   VERSION        INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                            KERNEL-VERSION                 CONTAINER-RUNTIME
+103-160-37-103.cprapid.com   Ready    control-plane,master   21h   v1.33.5+k3s1   103.160.37.103   <none>        AlmaLinux 8.10 (Cerulean Leopard)   4.18.0-240.15.1.el8_3.x86_64   containerd://2.1.4-k3s1
+```
 
 Cek NodePort yang digunakan oleh service (lihat di kolom PORT(S)):
-```kubectl get svc```
+```
+[ides@103-160-37-103 ~]$ kubectl get svc
+NAME          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+forkits-svc   NodePort    10.43.104.143   <none>        80:30001/TCP   133m
+```
 
 Akses di browser
 ```<ip node>:<ip port>```
