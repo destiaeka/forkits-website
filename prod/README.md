@@ -60,8 +60,9 @@ NAME                         STATUS   ROLES                  AGE   VERSION
 ## 🚀 Deploy Aplikasi ke Kubernetes
 File manifest untuk deploy bernama forkits-deployment.yml.
 File ini berisi 3 resource utama:
-- Deployment — mendefinisikan container dan jumlah replica.
-- Service (NodePort) — untuk expose aplikasi ke luar cluster.
+- Deployment — mendefinisikan container.
+- Service — untuk expose aplikasi ke luar cluster.
+- Ingress — mengatur routing HTTP/HTTPS di luar cluster ke service didalam cluster.
 - Horizontal Pod Autoscaler (HPA) — untuk auto-scale pod berdasarkan penggunaan CPU.
 
 1. Apply Manifest
@@ -95,22 +96,22 @@ Kamu akan melihat minimal 2 pod aktif (hasil scaling dari HPA).
 
 ## Untuk mengakses web dari browser:
 
-Cek IP node:
+Cek ingress:
 ```
-[ides@103-160-37-103 ~]$ kubectl get nodes -o wide
-NAME                         STATUS   ROLES                  AGE   VERSION        INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                            KERNEL-VERSION                 CONTAINER-RUNTIME
-103-160-37-103.cprapid.com   Ready    control-plane,master   21h   v1.33.5+k3s1   103.160.37.103   <none>        AlmaLinux 8.10 (Cerulean Leopard)   4.18.0-240.15.1.el8_3.x86_64   containerd://2.1.4-k3s1
-```
-
-Cek NodePort yang digunakan oleh service (lihat di kolom PORT(S)):
-```
-[ides@103-160-37-103 ~]$ kubectl get svc
-NAME          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
-forkits-svc   NodePort    10.43.104.143   <none>        80:30001/TCP   133m
+[ides@103-160-37-103 forkits-website]$ kubectl get ingress
+NAME              CLASS     HOSTS                     ADDRESS          PORTS   AGE
+forkits-ingress   traefik   forkits.destiaeka.local   103.160.37.103   80      15m
 ```
 
-Akses di browser
-```<ip node>:<ip port>```
+Akses di browser menggunakan HOST yang tertera di resource ingress
+```forkits.destiaeka.local```
+
+## ‼️ NOTE
+apabila gagal kalian bisa menambahkan host di komputer secara manual. hal ini disebebkan karena hostname belum dikenali oleh sistem DNS pada komputer. Untuk langkah langkahnya sebagao berikut
+1. buka notepad -> Run as Administrator
+2. buka file C:\Windows\System32\drivers\etc\hosts
+3. tambahkan ip dan dns ingress
+4. simpan dan keluar
 
 # ✅ Result
 ![result1](result1.jpeg)
