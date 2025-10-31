@@ -114,5 +114,5 @@ apabila gagal kalian bisa menambahkan host di komputer secara manual. hal ini di
 4. simpan dan keluar
 
 # ✅ Result
-![result1](result1.jpeg)
-![result2](result2.jpg)
+![result1](result1(1).jpg)
+![result2](result2(2).jpg)
